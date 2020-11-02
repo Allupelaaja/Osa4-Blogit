@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --verbose",
     "dev": "nodemon index.js"
   },
   "author": "Aleksi Heikkilä",
@@ -18,6 +18,10 @@
     "node": "^15.0.1"
   },
   "devDependencies": {
+    "jest": "^26.6.2",
     "nodemon": "^2.0.6"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
