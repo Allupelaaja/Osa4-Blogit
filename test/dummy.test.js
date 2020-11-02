@@ -252,3 +252,106 @@ describe('most common author', () => {
         expect(result).toEqual({ author: 'Edsger W. Dijkstra', blogs: 2 })
     })
 })
+
+describe('most liked author', () => {
+    const listOfAuthors = [
+        {
+            _id: '5a422aa71b54a676234d17f8',
+            title: 'Go To Statement Considered Harmful',
+            author: 'Edsger W. Dijkstra',
+            url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+            likes: 5,
+            __v: 0
+        },
+        {
+            _id: '1978578926798qa',
+            title: 'Blog for testing number 678',
+            author: 'Johnny Testman',
+            url: 'http://www.google.com',
+            likes: 21,
+            __v: 0
+        },
+        {
+            _id: '5490876889afsag',
+            title: 'Blog about nice flowers',
+            author: 'Matti Meikäläinen',
+            url: 'http://www.w3schools.com',
+            likes: 2,
+            __v: 0
+        },
+        {
+            _id: '489788979876a7fh',
+            title: 'Last blog about cool things',
+            author: 'Matti Meikäläinen',
+            url: 'http://www.iltalehti.fi',
+            likes: 13,
+            __v: 0
+        }
+    ]
+
+    const listOfSameAuthors = [
+        {
+            _id: '5a422aa71b54a676234d17f8',
+            title: 'Go To Statement Considered Harmful',
+            author: 'Edsger W. Dijkstra',
+            url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+            likes: 5,
+            __v: 0
+        },
+        {
+            _id: '1978578926798qa',
+            title: 'Blog for testing number 678',
+            author: 'Edsger W. Dijkstra',
+            url: 'http://www.google.com',
+            likes: 21,
+            __v: 0
+        },
+        {
+            _id: '5490876889afsag',
+            title: 'Blog about nice flowers',
+            author: 'Matti Meikäläinen',
+            url: 'http://www.w3schools.com',
+            likes: 2,
+            __v: 0
+        },
+        {
+            _id: '489788979876a7fh',
+            title: 'Last blog about cool things',
+            author: 'Matti Meikäläinen',
+            url: 'http://www.iltalehti.fi',
+            likes: 24,
+            __v: 0
+        }
+    ]
+
+    const onlyOneAuthor = [
+        {
+            _id: '5a422aa71b54a676234d17f8',
+            title: 'Go To Statement Considered Harmful',
+            author: 'Edsger W. Dijkstra',
+            url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+            likes: 5,
+            __v: 0
+        }
+    ]
+
+    test('of empty list is none', () => {
+        const result = listHelper.mostLikes([])
+        expect(result).toEqual({})
+    })
+
+    test('of list with one entry is Edsger W. Dijkstra', () => {
+        const result = listHelper.mostLikes(onlyOneAuthor)
+        expect(result).toEqual({ author: 'Edsger W. Dijkstra', likes: 5 })
+    })
+
+    test('of list is Matti Meikäläinen', () => {
+        const result = listHelper.mostLikes(listOfAuthors)
+        expect(result).toEqual({ author: 'Johnny Testman', likes: 21 })
+    })
+
+    test('of list with multiple authors with same amount is Edsger W. Dijkstra', () => {
+        const result = listHelper.mostLikes(listOfSameAuthors)
+        expect(result).toEqual({ author: 'Edsger W. Dijkstra', likes: 26 })
+    })
+})

@@ -1,4 +1,4 @@
-var lodash = require('lodash')
+var _ = require('lodash')
 
 const dummy = (blogs) => {
     return 1
@@ -48,32 +48,64 @@ const mostBlogs = (blogs) => {
     });
 
     //Lasketaan authorien esiintyvyydet
-    const result = lodash.values(lodash.groupBy(blogAuthors)).map(d => ({ name: d[0], count: d.length }));
+    const result = _.values(_.groupBy(blogAuthors)).map(d => ({ author: d[0], blogs: d.length }));
 
     //Katsotaan mitä löytyy eniten
     var biggestCount =
-        Math.max.apply(Math, result.map(function (f) {
-            return f.count
+        Math.max.apply(Math, result.map(function (blog) {
+            return blog.blogs
         }))
 
     var favorite =
-        result.find(function (f) {
-            return f.count == biggestCount
+        result.find(function (blog) {
+            return blog.blogs == biggestCount
         })
 
-    //Muutetaan vielä objektin muotoa
-    var author =
-    {
-        author: favorite.name,
-        blogs: favorite.count
+    return favorite
+}
+
+const mostLikes = (blogs) => {
+    if (blogs.length == 0) {
+        return {}
     }
 
-    return author
+    //Otetaan ylös kaikki uniquet authorit
+    const authorNames = _.uniq(_.map(blogs, "author"))
+
+    var blogAuthors = []
+
+    //Lasketaan authorien liket yhteen
+    _.forEach(authorNames, (name, index) => {
+        var sum = 0
+        _.forEach(blogs, blog => {
+            if (blog.author === name) {
+                sum += blog.likes
+                blogAuthors[index] = {
+                    author: name,
+                    likes: sum
+                }
+            }
+        })
+    });
+
+    //Katsotaan mitä löytyy eniten
+    var mostLikes =
+        Math.max.apply(Math, blogAuthors.map(function (author) {
+            return author.likes
+        }))
+
+    var favorite =
+        blogAuthors.find(function (author) {
+            return author.likes == mostLikes
+        })
+
+    return favorite
 }
 
 module.exports = {
     dummy,
     totalLikes,
     favoriteBlog,
-    mostBlogs
+    mostBlogs,
+    mostLikes
 }
