@@ -84,6 +84,51 @@ test('the first blog is about Go To Statement Considered Harmful', async () => {
     expect(response.body[0].title).toBe('Go To Statement Considered Harmful')
 })
 
+test('a valid blog can be added ', async () => {
+    const newBlog = {
+        _id: '5a422aa71b54a676234d17f1',
+        title: 'async/await simplifies making async calls',
+        author: 'Schoolman Mcsmart',
+        url: 'http://www.wikipedia.org',
+        likes: 101,
+        __v: 0
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+
+    const titles = response.body.map(r => r.title)
+
+    expect(response.body).toHaveLength(initialBlogs.length + 1)
+    expect(titles).toContain(
+        'async/await simplifies making async calls'
+    )
+})
+
+test('blog without title is not added', async () => {
+    const newBlog = {
+        _id: '5a422aa71b54a676234d17f0',
+        author: 'notitle testblog',
+        url: 'http://www.testsite.fi',
+        likes: 11,
+        __v: 0
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+
+    const response = await api.get('/api/blogs')
+
+    expect(response.body).toHaveLength(initialBlogs.length)
+})
+
 afterAll(() => {
     mongoose.connection.close()
 })
