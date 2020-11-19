@@ -4,9 +4,11 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 beforeEach(async () => {
     await Blog.deleteMany({})
+    await User.deleteMany({})
     let blogObject = new Blog(helper.initialBlogs[0])
     await blogObject.save()
     blogObject = new Blog(helper.initialBlogs[1])
@@ -53,6 +55,7 @@ test('the first blog is about Go To Statement Considered Harmful', async () => {
 })
 
 test('a valid blog can be added ', async () => {
+
     const newBlog = {
         title: 'async/await simplifies making async calls',
         author: 'Schoolman Mcsmart',
@@ -63,6 +66,7 @@ test('a valid blog can be added ', async () => {
     await api
         .post('/api/blogs')
         .send(newBlog)
+        .set({ Authorization: await helper.loginUser() })
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
@@ -77,6 +81,7 @@ test('a valid blog can be added ', async () => {
 })
 
 test('blog without title and url is not added', async () => {
+
     const newBlog = {
         author: 'notitle testblog',
         likes: 11,
@@ -85,6 +90,7 @@ test('blog without title and url is not added', async () => {
     await api
         .post('/api/blogs')
         .send(newBlog)
+        .set({ Authorization: await helper.loginUser() })
         .expect(400)
 
     const blogsAtEnd = await helper.blogsInDb()
@@ -93,6 +99,7 @@ test('blog without title and url is not added', async () => {
 })
 
 test('blog without likes has 0 likes as default', async () => {
+
     const newBlog = {
         title: "testing blog for testing",
         author: 'nolikes testing',
@@ -102,6 +109,7 @@ test('blog without likes has 0 likes as default', async () => {
     await api
         .post('/api/blogs')
         .send(newBlog)
+        .set({ Authorization: await helper.loginUser() })
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
@@ -114,6 +122,7 @@ test('blog without likes has 0 likes as default', async () => {
 })
 
 test('blog has field id instead of _id ', async () => {
+
     const newBlog = {
         title: 'id field testing',
         author: 'Testerperson',
@@ -124,12 +133,32 @@ test('blog has field id instead of _id ', async () => {
     await api
         .post('/api/blogs')
         .send(newBlog)
+        .set({ Authorization: await helper.loginUser() })
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
     const blogsAtEnd = await helper.blogsInDb()
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
     expect(blogsAtEnd[0].id).toBeDefined()
+})
+
+test('a blog cannot be added without token ', async () => {
+
+    const newBlog = {
+        title: 'async/await simplifies making async calls',
+        author: 'Schoolman Mcsmart',
+        url: 'http://www.wikipedia.org',
+        likes: 101,
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
 })
 
 afterAll(() => {
